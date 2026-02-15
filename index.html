@@ -23,14 +23,14 @@
         .bg-bottom { fill: #ffffff; }
 
         /* 文字のデザイン：視認性を高めたポップなスタイル */
-        .hour-text { font-size: 42px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
+        .hour-text { font-size: 45px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
         .min-sec-text { font-size: 17px; fill: #666; text-anchor: middle; font-weight: 800; }
         
         /* ロゴのバランス調整：1行目と2行目の対比を美しく */
         .logo-text-main { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
-        .logo-text-sub { font-size: 28px; fill: #333; text-anchor: middle; font-weight: 800; }
+        .logo-text-sub { font-size: 30px; fill: #333; text-anchor: middle; font-weight: 800; }
 
-        /* 針のデザイン：元デザインを忠実に再現（赤い秒針） */
+        /* 針のデザイン：秒針は赤い秒針 */
         #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
         #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
         #second-hand { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; }
@@ -47,7 +47,7 @@
     <g id="hours-layer"></g>
 
     <text x="500" y="660" class="logo-text-main">Today is the youngest day</text>
-    <text x="500" y="715" class="logo-text-sub">of your life</text>
+    /* <text x="500" y="715" class="logo-text-sub">of your life</text> */
 
     <line id="hour-hand" x1="500" y1="500" x2="500" y2="280" />
     <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
