@@ -5,7 +5,7 @@
     <title>Today is the youngest day of your life - 24H Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet">
     <style>
-        /* 【CSS：見た目のルール】 */
+        /* 【CSS：見た目の設計図】 */
         body { 
             margin: 0; 
             display: flex; 
@@ -18,19 +18,19 @@
         }
         svg { width: 95vmin; height: 95vmin; }
 
-        /* 背景色：上半分を青(#90d5f0)、下半分を白に設定 */
+        /* 配色設定：上部を明るい灰みの青(#90d5f0)、下部を白に */
         .bg-top { fill: #90d5f0; }
         .bg-bottom { fill: #ffffff; }
 
-        /* 文字のデザイン設定 */
+        /* 文字のデザイン：視認性を高めたポップなスタイル */
         .hour-text { font-size: 42px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
         .min-sec-text { font-size: 17px; fill: #666; text-anchor: middle; font-weight: 800; }
         
-        /* ロゴ：1行目(main)と2行目(sub)のバランスを最適化 */
+        /* ロゴのバランス調整：1行目と2行目の対比を美しく */
         .logo-text-main { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
         .logo-text-sub { font-size: 28px; fill: #333; text-anchor: middle; font-weight: 800; }
 
-        /* 針のデザイン（元データを忠実に再現） */
+        /* 針のデザイン：元デザインを忠実に再現（赤い秒針） */
         #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
         #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
         #second-hand { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; }
@@ -56,13 +56,13 @@
 </svg>
 
 <script>
-    /* 【JavaScript：動かすための論理】 */
+    /* 【JavaScript：動かすための仕組み】 */
     const hoursLayer = document.getElementById('hours-layer');
     const ticksLayer = document.getElementById('ticks-layer');
 
-    // 1. 24時間の数字を自動配置（内側）
+    // 1. 24時間の数字を配置する（内側の数字）
     for (let i = 1; i <= 24; i++) {
-        const angle = (i * 15 - 90) * (Math.PI / 180); // 15度ずつ回転
+        const angle = (i * 15 - 90) * (Math.PI / 180);
         const x = 500 + 360 * Math.cos(angle);
         const y = 500 + 360 * Math.sin(angle);
         const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -73,13 +73,13 @@
         hoursLayer.appendChild(t);
     }
 
-    // 2. 外周の「分・秒」目盛りと数字(00, 05...)を自動配置
+    // 2. 外周の分・秒（00〜55とドット）を配置する
     for (let i = 0; i < 60; i++) {
-        const angle = (i * 6 - 90) * (Math.PI / 180); // 6度ずつ回転
+        const angle = (i * 6 - 90) * (Math.PI / 180);
         const x = 500 + 440 * Math.cos(angle);
         const y = 500 + 440 * Math.sin(angle);
         if (i % 5 === 0) {
-            // 5分ごとの数字
+            // 5分ごとの数字表示
             const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
             t.setAttribute("x", x);
             t.setAttribute("y", y + 6);
@@ -87,7 +87,7 @@
             t.textContent = i === 0 ? "00" : i.toString().padStart(2, '0');
             ticksLayer.appendChild(t);
         } else {
-            // 細かな目盛り（ドット）
+            // ドットの表示
             const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             c.setAttribute("cx", x);
             c.setAttribute("cy", y);
@@ -97,20 +97,22 @@
         }
     }
 
-    // 3. 針を現在の時間に合わせて回転させる関数
+    // 3. 時計を現在の時間に更新する関数
     function updateClock() {
         const now = new Date();
-        const s = now.getSeconds() + now.getMilliseconds() / 1000; // 秒（滑らかに）
-        const m = now.getMinutes() + s / 60; // 分
-        const h = now.getHours() + m / 60;   // 24時間計
+        const ms = now.getMilliseconds();
+        const s = now.getSeconds() + ms / 1000;
+        const m = now.getMinutes() + s / 60;
+        const h = now.getHours() + m / 60;
 
-        // 角度計算：24時間計は1時間で15度、分と秒は1単位で6度
+        // 角度を計算して針を回転させます
+        // 24時間計(15度/時)、分(6度/分)、秒(6度/秒)
         document.getElementById('hour-hand').setAttribute('transform', `rotate(${h * 15}, 500, 500)`);
         document.getElementById('minute-hand').setAttribute('transform', `rotate(${m * 6}, 500, 500)`);
         document.getElementById('second-hand').setAttribute('transform', `rotate(${s * 6}, 500, 500)`);
     }
 
-    // 0.05秒(50ms)ごとに更新して、時計を滑らかに動かします
+    // 50ミリ秒ごとに更新（秒針の動きを滑らかにしつつ、不自然な加速を抑制）
     setInterval(updateClock, 50); 
     updateClock();
 </script>
