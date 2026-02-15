@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Today is the youngest day of your life - 24H Kids Clock</title>
+    <title>Today is the youngest day of your life - 24H Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet">
     <style>
-        /* 【見た目の設定：CSS】 */
+        /* 【CSS：見た目のルール】 */
         body { 
             margin: 0; 
             display: flex; 
@@ -14,22 +14,23 @@
             height: 100vh; 
             background: #f0f0f0; 
             font-family: 'M PLUS Rounded 1c', sans-serif; 
+            overflow: hidden;
         }
         svg { width: 95vmin; height: 95vmin; }
 
-        /* 背景：上半分を青(#90d5f0)、下半分を白に設定 */
+        /* 背景色：上半分を青(#90d5f0)、下半分を白に設定 */
         .bg-top { fill: #90d5f0; }
         .bg-bottom { fill: #ffffff; }
 
-        /* 文字のデザイン：大きさや色、太さを決めています */
+        /* 文字のデザイン設定 */
         .hour-text { font-size: 42px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
         .min-sec-text { font-size: 17px; fill: #666; text-anchor: middle; font-weight: 800; }
         
-        /* ロゴのバランス：1行目を大きく、2行目を少し小さくして美しく配置 */
+        /* ロゴ：1行目(main)と2行目(sub)のバランスを最適化 */
         .logo-text-main { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
         .logo-text-sub { font-size: 28px; fill: #333; text-anchor: middle; font-weight: 800; }
 
-        /* 針のデザイン：太さと色を設定（秒針は赤） */
+        /* 針のデザイン（元データを忠実に再現） */
         #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
         #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
         #second-hand { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; }
@@ -46,7 +47,7 @@
     <g id="hours-layer"></g>
 
     <text x="500" y="660" class="logo-text-main">Today is the youngest day</text>
-    <text x="500" y="710" class="logo-text-sub">of your life</text>
+    <text x="500" y="715" class="logo-text-sub">of your life</text>
 
     <line id="hour-hand" x1="500" y1="500" x2="500" y2="280" />
     <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
@@ -55,13 +56,63 @@
 </svg>
 
 <script>
-    /* 【動きの命令：JavaScript】 */
+    /* 【JavaScript：動かすための論理】 */
     const hoursLayer = document.getElementById('hours-layer');
     const ticksLayer = document.getElementById('ticks-layer');
 
-    // 1. 24時間の数字を自動で作るループ処理
+    // 1. 24時間の数字を自動配置（内側）
     for (let i = 1; i <= 24; i++) {
-        const angle = (i * 15 - 90) * (Math.PI / 180); // 360度を24で割ると15度ずつ
+        const angle = (i * 15 - 90) * (Math.PI / 180); // 15度ずつ回転
         const x = 500 + 360 * Math.cos(angle);
         const y = 500 + 360 * Math.sin(angle);
-        const t = document.createElementNS("
+        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t.setAttribute("x", x);
+        t.setAttribute("y", y);
+        t.classList.add("hour-text");
+        t.textContent = i;
+        hoursLayer.appendChild(t);
+    }
+
+    // 2. 外周の「分・秒」目盛りと数字(00, 05...)を自動配置
+    for (let i = 0; i < 60; i++) {
+        const angle = (i * 6 - 90) * (Math.PI / 180); // 6度ずつ回転
+        const x = 500 + 440 * Math.cos(angle);
+        const y = 500 + 440 * Math.sin(angle);
+        if (i % 5 === 0) {
+            // 5分ごとの数字
+            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            t.setAttribute("x", x);
+            t.setAttribute("y", y + 6);
+            t.classList.add("min-sec-text");
+            t.textContent = i === 0 ? "00" : i.toString().padStart(2, '0');
+            ticksLayer.appendChild(t);
+        } else {
+            // 細かな目盛り（ドット）
+            const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c.setAttribute("cx", x);
+            c.setAttribute("cy", y);
+            c.setAttribute("r", "2.5");
+            c.setAttribute("fill", "#bbb");
+            ticksLayer.appendChild(c);
+        }
+    }
+
+    // 3. 針を現在の時間に合わせて回転させる関数
+    function updateClock() {
+        const now = new Date();
+        const s = now.getSeconds() + now.getMilliseconds() / 1000; // 秒（滑らかに）
+        const m = now.getMinutes() + s / 60; // 分
+        const h = now.getHours() + m / 60;   // 24時間計
+
+        // 角度計算：24時間計は1時間で15度、分と秒は1単位で6度
+        document.getElementById('hour-hand').setAttribute('transform', `rotate(${h * 15}, 500, 500)`);
+        document.getElementById('minute-hand').setAttribute('transform', `rotate(${m * 6}, 500, 500)`);
+        document.getElementById('second-hand').setAttribute('transform', `rotate(${s * 6}, 500, 500)`);
+    }
+
+    // 0.05秒(50ms)ごとに更新して、時計を滑らかに動かします
+    setInterval(updateClock, 50); 
+    updateClock();
+</script>
+</body>
+</html>
