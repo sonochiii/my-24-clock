@@ -2,21 +2,21 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Study with Sonochiii - 24H Kids Clock</title>
+    <title>Today is the youngest day of your life - 24H Kids Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; font-family: 'M PLUS Rounded 1c', sans-serif; }
         svg { width: 95vmin; height: 95vmin; }
-        /* 配色：上部 #90d5f0 / 下部 白 */
+        /* 配色修正：上部 #90d5f0 / 下部 白 */
         .bg-top { fill: #90d5f0; }
         .bg-bottom { fill: #ffffff; }
-        /* フォント設定 */
-        .hour-text { font-size: 38px; fill: #333; text-anchor: middle; dominant-baseline: central; }
-        .min-sec-text { font-size: 16px; fill: #666; text-anchor: middle; }
+        /* フォントとテキストの最適化 */
+        .hour-text { font-size: 38px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
+        .min-sec-text { font-size: 16px; fill: #666; text-anchor: middle; font-weight: 800; }
         .logo-text { font-size: 24px; fill: #333; text-anchor: middle; font-weight: 800; }
         /* 針のデザイン */
-        #hour-hand { stroke: #222; stroke-width: 14; stroke-linecap: round; }
-        #minute-hand { stroke: #222; stroke-width: 10; stroke-linecap: round; }
+        #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
+        #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
         #second-hand { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; }
     </style>
 </head>
@@ -24,10 +24,10 @@
 <svg viewBox="0 0 1000 1000">
     <path d="M 500,500 L 20,500 A 480,480 0 0,1 980,500 Z" class="bg-top" />
     <path d="M 500,500 L 980,500 A 480,480 0 0,1 20,500 Z" class="bg-bottom" />
-    <circle cx="500" cy="500" r="480" fill="none" stroke="#ddd" stroke-width="1"/>
+    <circle cx="500" cy="500" r="480" fill="none" stroke="#eeeeee" stroke-width="2"/>
 
-    <g id="ticks"></g>
-    <g id="hours"></g>
+    <g id="ticks-layer"></g>
+    <g id="hours-layer"></g>
 
     <text x="500" y="660" class="logo-text">Today is the youngest day</text>
     <text x="500" y="700" class="logo-text" style="font-size: 18px;">of your life</text>
@@ -35,28 +35,58 @@
     <line id="hour-hand" x1="500" y1="500" x2="500" y2="280" />
     <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
     <line id="second-hand" x1="500" y1="500" x2="500" y2="80" />
-    <circle cx="500" cy="500" r="12" fill="#222" />
+    <circle cx="500" cy="500" r="10" fill="#222" />
 </svg>
 
 <script>
-    const hoursG = document.getElementById('hours');
-    const ticksG = document.getElementById('ticks');
+    const hoursLayer = document.getElementById('hours-layer');
+    const ticksLayer = document.getElementById('ticks-layer');
 
     // 24時間目盛り（内側）
     for (let i = 1; i <= 24; i++) {
-        const val = i === 24 ? 24 : i;
         const angle = (i * 15 - 90) * (Math.PI / 180);
         const x = 500 + 360 * Math.cos(angle);
         const y = 500 + 360 * Math.sin(angle);
         const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
         t.setAttribute("x", x); t.setAttribute("y", y);
         t.classList.add("hour-text");
-        t.textContent = val;
-        hoursG.appendChild(t);
+        t.textContent = i;
+        hoursLayer.appendChild(t);
     }
 
-    // 分・秒目盛り（外周ドットと5分刻みの数字）
+    // 分・秒目盛り（画像通りのドットと5分刻みの数値）
     for (let i = 0; i < 60; i++) {
         const angle = (i * 6 - 90) * (Math.PI / 180);
+        const x = 500 + 440 * Math.cos(angle);
+        const y = 500 + 440 * Math.sin(angle);
         if (i % 5 === 0) {
-            const x = 500
+            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            t.setAttribute("x", x); t.setAttribute("y", y + 6);
+            t.classList.add("min-sec-text");
+            t.textContent = i === 0 ? "00" : i.toString().padStart(2, '0');
+            ticksLayer.appendChild(t);
+        } else {
+            const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c.setAttribute("cx", x); c.setAttribute("cy", y);
+            c.setAttribute("r", "2.5"); c.setAttribute("fill", "#bbb");
+            ticksLayer.appendChild(c);
+        }
+    }
+
+    function update() {
+        const now = new Date();
+        const s = now.getSeconds() + now.getMilliseconds() / 1000;
+        const m = now.getMinutes() + s / 60;
+        const h = now.getHours() + m / 60;
+
+        // 24時間計(15度/h), 分(6度/m), 秒(6度/s)
+        document.getElementById('hour-hand').setAttribute('transform', `rotate(${h * 15}, 500, 500)`);
+        document.getElementById('minute-hand').setAttribute('transform', `rotate(${m * 6}, 500, 500)`);
+        document.getElementById('second-hand').setAttribute('transform', `rotate(${s * 6}, 500, 500)`);
+    }
+
+    setInterval(update, 50); // 滑らかな動きのために更新頻度を向上
+    update();
+</script>
+</body>
+</html>
