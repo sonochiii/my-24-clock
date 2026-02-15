@@ -11,9 +11,9 @@
         .bg-top { fill: #90d5f0; }
         .bg-bottom { fill: #ffffff; }
         /* フォントとテキストの最適化 */
-        .hour-text { font-size: 38px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
-        .min-sec-text { font-size: 16px; fill: #666; text-anchor: middle; font-weight: 800; }
-        .logo-text { font-size: 24px; fill: #333; text-anchor: middle; font-weight: 800; }
+        .hour-text { font-size: 42px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
+        .min-sec-text { font-size: 17px; fill: #666; text-anchor: middle; font-weight: 800; }
+        .logo-text { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
         /* 針のデザイン */
         #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
         #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
@@ -30,7 +30,7 @@
     <g id="hours-layer"></g>
 
     <text x="500" y="660" class="logo-text">Today is the youngest day</text>
-    <text x="500" y="700" class="logo-text" style="font-size: 18px;">of your life</text>
+    <text x="500" y="700" class="logo-text" style="font-size: 22px;">of your life</text>
 
     <line id="hour-hand" x1="500" y1="500" x2="500" y2="280" />
     <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
@@ -85,7 +85,7 @@
         document.getElementById('second-hand').setAttribute('transform', `rotate(${s * 6}, 500, 500)`);
     }
 
-    setInterval(update, 50); // 滑らかな動きのために更新頻度を向上
+            // setInterval(update, 50); // 滑らかな動きのために更新頻度を向上
     update();
 </script>
 </body>
