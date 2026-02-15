@@ -5,22 +5,38 @@
     <title>Today is the youngest day of your life - 24H Kids Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; font-family: 'M PLUS Rounded 1c', sans-serif; }
+        /* 【見た目の設定：CSS】 */
+        body { 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background: #f0f0f0; 
+            font-family: 'M PLUS Rounded 1c', sans-serif; 
+        }
         svg { width: 95vmin; height: 95vmin; }
-        /* 配色修正：上部 #90d5f0 / 下部 白 */
+
+        /* 背景：上半分を青(#90d5f0)、下半分を白に設定 */
         .bg-top { fill: #90d5f0; }
         .bg-bottom { fill: #ffffff; }
-        /* フォントとテキストの最適化 */
+
+        /* 文字のデザイン：大きさや色、太さを決めています */
         .hour-text { font-size: 42px; fill: #333; text-anchor: middle; dominant-baseline: central; font-weight: 800; }
         .min-sec-text { font-size: 17px; fill: #666; text-anchor: middle; font-weight: 800; }
-        .logo-text { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
-        /* 針のデザイン */
+        
+        /* ロゴのバランス：1行目を大きく、2行目を少し小さくして美しく配置 */
+        .logo-text-main { font-size: 35px; fill: #333; text-anchor: middle; font-weight: 800; }
+        .logo-text-sub { font-size: 28px; fill: #333; text-anchor: middle; font-weight: 800; }
+
+        /* 針のデザイン：太さと色を設定（秒針は赤） */
         #hour-hand { stroke: #222; stroke-width: 12; stroke-linecap: round; }
         #minute-hand { stroke: #222; stroke-width: 8; stroke-linecap: round; }
         #second-hand { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; }
     </style>
 </head>
 <body>
+
 <svg viewBox="0 0 1000 1000">
     <path d="M 500,500 L 20,500 A 480,480 0 0,1 980,500 Z" class="bg-top" />
     <path d="M 500,500 L 980,500 A 480,480 0 0,1 20,500 Z" class="bg-bottom" />
@@ -29,8 +45,8 @@
     <g id="ticks-layer"></g>
     <g id="hours-layer"></g>
 
-    <text x="500" y="660" class="logo-text">Today is the youngest day</text>
-    <text x="500" y="700" class="logo-text" style="font-size: 22px;">of your life</text>
+    <text x="500" y="660" class="logo-text-main">Today is the youngest day</text>
+    <text x="500" y="710" class="logo-text-sub">of your life</text>
 
     <line id="hour-hand" x1="500" y1="500" x2="500" y2="280" />
     <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
@@ -39,54 +55,13 @@
 </svg>
 
 <script>
+    /* 【動きの命令：JavaScript】 */
     const hoursLayer = document.getElementById('hours-layer');
     const ticksLayer = document.getElementById('ticks-layer');
 
-    // 24時間目盛り（内側）
+    // 1. 24時間の数字を自動で作るループ処理
     for (let i = 1; i <= 24; i++) {
-        const angle = (i * 15 - 90) * (Math.PI / 180);
+        const angle = (i * 15 - 90) * (Math.PI / 180); // 360度を24で割ると15度ずつ
         const x = 500 + 360 * Math.cos(angle);
         const y = 500 + 360 * Math.sin(angle);
-        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        t.setAttribute("x", x); t.setAttribute("y", y);
-        t.classList.add("hour-text");
-        t.textContent = i;
-        hoursLayer.appendChild(t);
-    }
-
-    // 分・秒目盛り（画像通りのドットと5分刻みの数値）
-    for (let i = 0; i < 60; i++) {
-        const angle = (i * 6 - 90) * (Math.PI / 180);
-        const x = 500 + 440 * Math.cos(angle);
-        const y = 500 + 440 * Math.sin(angle);
-        if (i % 5 === 0) {
-            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            t.setAttribute("x", x); t.setAttribute("y", y + 6);
-            t.classList.add("min-sec-text");
-            t.textContent = i === 0 ? "00" : i.toString().padStart(2, '0');
-            ticksLayer.appendChild(t);
-        } else {
-            const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            c.setAttribute("cx", x); c.setAttribute("cy", y);
-            c.setAttribute("r", "2.5"); c.setAttribute("fill", "#bbb");
-            ticksLayer.appendChild(c);
-        }
-    }
-
-    function update() {
-        const now = new Date();
-        const s = now.getSeconds() + now.getMilliseconds() / 1000;
-        const m = now.getMinutes() + s / 60;
-        const h = now.getHours() + m / 60;
-
-        // 24時間計(15度/h), 分(6度/m), 秒(6度/s)
-        document.getElementById('hour-hand').setAttribute('transform', `rotate(${h * 15}, 500, 500)`);
-        document.getElementById('minute-hand').setAttribute('transform', `rotate(${m * 6}, 500, 500)`);
-        document.getElementById('second-hand').setAttribute('transform', `rotate(${s * 6}, 500, 500)`);
-    }
-
-            // setInterval(update, 50); // 滑らかな動きのために更新頻度を向上
-    update();
-</script>
-</body>
-</html>
+        const t = document.createElementNS("
