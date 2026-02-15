@@ -2,92 +2,64 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today is the youngest day of your life Clock</title>
+    <title>Study with Sonochiii - 24H Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #99d5ff; /* スカイブルー */
-            font-family: 'M PLUS Rounded 1c', sans-serif;
-        }
-        svg {
-            width: 90vw;
-            height: 90vw;
-            max-width: 600px;
-            max-height: 600px;
-        }
-        /* 文字盤の数字 */
-        .hour-label {
-            font-size: 45px;
-            fill: #1f2b33; /* 濃紺 */
-            font-weight: bold;
-            text-anchor: middle;
-            dominant-baseline: middle;
-        }
-        /* メッセージロゴ */
-        .logo-text {
-            font-size: 28px;
-            fill: #5d5d5d;
-            text-anchor: middle;
-        }
-        /* 時計の針 */
-        #hour-hand { stroke: #ff9a9e; stroke-width: 8; stroke-linecap: round; }
-        #minute-hand { stroke: #a1c4fd; stroke-width: 5; stroke-linecap: round; }
-        #second-hand { stroke: #fbc2eb; stroke-width: 2; stroke-linecap: round; }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; font-family: 'M PLUS Rounded 1c', sans-serif; }
+        svg { width: 90vmin; height: 90vmin; }
+        .bg-gradient { fill: url(#dayNightGradient); }
+        /* 文字盤の数字をかわいく */
+        .hour-label { font-size: 35px; fill: white; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+        /* ロゴを英語メッセージに */
+        .logo-text { font-size: 24px; fill: white; text-anchor: middle; font-weight: 700; }
+        #hour-hand { stroke: white; stroke-width: 6; stroke-linecap: round; }
+        #minute-hand { stroke: rgba(255,255,255,0.7); stroke-width: 4; stroke-linecap: round; }
+        #second-hand { stroke: #ff4757; stroke-width: 2; }
     </style>
 </head>
 <body>
-
 <svg viewBox="0 0 1000 1000">
-    <circle cx="500" cy="500" r="480" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+    <defs>
+        <linearGradient id="dayNightGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#1e3799;"/>
+            <stop offset="50%" style="stop-color:#4a69bd;"/>
+            <stop offset="100%" style="stop-color:#1e3799;"/>
+        </linearGradient>
+    </defs>
+    <circle cx="500" cy="500" r="480" class="bg-gradient" />
     
-    <text x="500" y="460" class="logo-text">Today is the</text>
-    <text x="500" y="510" class="logo-text" style="font-weight: bold;">youngest day</text>
-    <text x="500" y="560" class="logo-text">of your life</text>
+    <text x="500" y="480" class="logo-text">Today is the youngest day</text>
+    <text x="500" y="520" class="logo-text" style="font-size: 18px;">of your life</text>
 
-    <g id="clock-face"></g>
-
-    <line id="hour-hand" x1="500" y1="500" x2="500" y2="250" />
-    <line id="minute-hand" x1="500" y1="500" x2="500" y2="150" />
-    <line id="second-hand" x1="500" y1="500" x2="500" y2="100" />
-    <circle cx="500" cy="500" r="10" fill="#5d5d5d" />
+    <g id="face"></g>
+    <line id="hour-hand" x1="500" y1="500" x2="500" y2="200" />
+    <line id="minute-hand" x1="500" y1="500" x2="500" y2="100" />
+    <line id="second-hand" x1="500" y1="500" x2="500" y2="80" />
+    <circle cx="500" cy="500" r="8" fill="white" />
 </svg>
 
 <script>
-    const face = document.getElementById('clock-face');
-    // 24時間の数字を配置
+    const face = document.getElementById('face');
     for (let i = 0; i < 24; i++) {
         const angle = (i * 15 - 90) * (Math.PI / 180);
-        const x = 500 + 400 * Math.cos(angle);
-        const y = 500 + 400 * Math.sin(angle);
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", x);
-        text.setAttribute("y", y);
-        text.classList.add("hour-label");
-        text.textContent = i;
-        face.appendChild(text);
+        const x = 500 + 420 * Math.cos(angle);
+        const y = 500 + 420 * Math.sin(angle);
+        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t.setAttribute("x", x); t.setAttribute("y", y);
+        t.classList.add("hour-label");
+        t.textContent = i;
+        face.appendChild(t);
     }
-
-    function updateClock() {
+    function tick() {
         const now = new Date();
-        const hrs = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
-        const mins = now.getMinutes() + now.getSeconds() / 60;
-        const secs = now.getSeconds();
-
-        // 24時間計なので 360/24 = 15度ずつ
-        document.getElementById('hour-hand').setAttribute('transform', `rotate(${hrs * 15}, 500, 500)`);
-        document.getElementById('minute-hand').setAttribute('transform', `rotate(${mins * 6}, 500, 500)`);
-        document.getElementById('second-hand').setAttribute('transform', `rotate(${secs * 6}, 500, 500)`);
+        const h = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
+        const m = now.getMinutes() + now.getSeconds()/60;
+        const s = now.getSeconds();
+        document.getElementById('hour-hand').setAttribute('transform', `rotate(${h*15},500,500)`);
+        document.getElementById('minute-hand').setAttribute('transform', `rotate(${m*6},500,500)`);
+        document.getElementById('second-hand').setAttribute('transform', `rotate(${s*6},500,500)`);
     }
-
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(tick, 1000); tick();
 </script>
-
 </body>
 </html>
